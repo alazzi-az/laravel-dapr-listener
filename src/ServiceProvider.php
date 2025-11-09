@@ -12,7 +12,7 @@ class ServiceProvider extends BaseServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/dapr.php', 'dapr');
+        $this->mergeConfigFrom(__DIR__.'/../config/dapr-events.php', 'dapr');
 
         $this->app->singleton(EventHydrator::class);
         $this->app->singleton(SubscriptionDiscovery::class);
