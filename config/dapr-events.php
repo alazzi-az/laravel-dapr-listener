@@ -3,9 +3,9 @@
 return [
     'listener' => [
         'middleware' => [
-            \AlazziAz\DaprEventsListener\Middleware\RetryOnceMiddleware::class,
-            \AlazziAz\DaprEventsListener\Middleware\CorrelatedMessageMiddleware::class,
-            \AlazziAz\DaprEventsListener\Middleware\TenantHydratorMiddleware::class,
+            \AlazziAz\LaravelDaprListener\Middleware\RetryOnceMiddleware::class,
+            \AlazziAz\LaravelDaprListener\Middleware\CorrelatedMessageMiddleware::class,
+            \AlazziAz\LaravelDaprListener\Middleware\TenantHydratorMiddleware::class,
         ],
     ],
 ];

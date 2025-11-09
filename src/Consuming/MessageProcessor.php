@@ -1,12 +1,12 @@
 <?php
 
-namespace AlazziAz\DaprEventsListener\Consuming;
+namespace AlazziAz\LaravelDaprListener\Consuming;
 
-use AlazziAz\DaprEvents\Support\IngressContext;
-use AlazziAz\DaprEvents\Support\IngressSignatureVerifier;
-use AlazziAz\DaprEvents\Support\Subscription;
-use AlazziAz\DaprEvents\Support\SubscriptionRegistry;
-use AlazziAz\DaprEventsListener\Support\EventHydrator;
+use AlazziAz\LaravelDapr\Support\IngressContext;
+use AlazziAz\LaravelDapr\Support\IngressSignatureVerifier;
+use AlazziAz\LaravelDapr\Support\Subscription;
+use AlazziAz\LaravelDapr\Support\SubscriptionRegistry;
+use AlazziAz\LaravelDaprListener\Support\EventHydrator;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
@@ -54,7 +54,7 @@ class MessageProcessor
             $request
         );
 
-        $middleware = $this->config->get('dapr-events.listener.middleware', []);
+        $middleware = $this->config->get('dapr.listener.middleware', []);
 
         $context = $this->pipeline
             ->send($context)

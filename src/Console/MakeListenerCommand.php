@@ -1,6 +1,6 @@
 <?php
 
-namespace AlazziAz\DaprEventsListener\Console;
+namespace AlazziAz\LaravelDaprListener\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class MakeListenerCommand extends Command
 {
-    protected $signature = 'dapr-events:listener 
+    protected $signature = 'dapr:listener 
         {event : The fully qualified class name of the event} 
         {--name= : Override the generated listener class name} 
         {--force : Overwrite the listener if it already exists}';
@@ -47,7 +47,7 @@ class MakeListenerCommand extends Command
         $this->files->put($path, $stub);
 
         $this->components->info("Listener [{$qualified}] created.");
-        $this->components->info("Remember to add #[\\AlazziAz\\DaprEvents\\Attributes\\Topic] to your event if needed.");
+        $this->components->info("Remember to add #[\\AlazziAz\\LaravelDapr\\Attributes\\Topic] to your event if needed.");
 
         return self::SUCCESS;
     }

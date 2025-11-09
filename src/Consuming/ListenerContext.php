@@ -1,8 +1,8 @@
 <?php
 
-namespace AlazziAz\DaprEventsListener\Consuming;
+namespace AlazziAz\LaravelDaprListener\Consuming;
 
-use AlazziAz\DaprEvents\Support\Subscription;
+use AlazziAz\LaravelDapr\Support\Subscription;
 use Illuminate\Http\Request;
 
 class ListenerContext

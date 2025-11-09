@@ -1,6 +1,6 @@
 <?php
 
-namespace AlazziAz\DaprEventsListener\Support;
+namespace AlazziAz\LaravelDaprListener\Support;
 
 use ReflectionClass;
 

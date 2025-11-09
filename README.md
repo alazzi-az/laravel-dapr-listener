@@ -15,9 +15,9 @@ composer require alazziaz/laravel-dapr-listener
 
 ## Subscription discovery
 
-The service provider scans `app/Events` and `app/Listeners` for the `#[Topic]` attribute and registers derived topics with the shared `SubscriptionRegistry`. Configured overrides in `config/dapr-events.php` are merged automatically.
+The service provider scans `app/Events` and `app/Listeners` for the `#[Topic]` attribute and registers derived topics with the shared `SubscriptionRegistry`. Configured overrides in `config/dapr.php` are merged automatically.
 
-Run `php artisan dapr-events:list` to inspect the discovered routes.
+Run `php artisan dapr:list` to inspect the discovered routes.
 
 ## HTTP ingress
 
@@ -38,7 +38,7 @@ Configured through `listener.middleware`:
 
 ## Artisan tooling
 
-`php artisan dapr-events:listener App\\Events\\OrderPlaced` scaffolds a listener class in `app/Listeners`, defaulting to `OrderPlacedListener`.
+`php artisan dapr:listener App\\Events\\OrderPlaced` scaffolds a listener class in `app/Listeners`, defaulting to `OrderPlacedListener`.
 
 The stub integrates cleanly with Laravel's native event system—no special base classes required.
 

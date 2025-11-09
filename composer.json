@@ -19,18 +19,18 @@
     },
     "autoload": {
         "psr-4": {
-            "AlazziAz\\DaprEventsListener\\": "src/"
+            "AlazziAz\\LaravelDaprListener\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "AlazziAz\\DaprEventsListener\\Tests\\": "tests/"
+            "AlazziAz\\LaravelDaprListener\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "AlazziAz\\DaprEventsListener\\ServiceProvider"
+                "AlazziAz\\LaravelDaprListener\\ServiceProvider"
             ]
         }
     },

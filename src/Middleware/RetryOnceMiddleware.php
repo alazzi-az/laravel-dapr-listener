@@ -1,8 +1,8 @@
 <?php
 
-namespace AlazziAz\DaprEventsListener\Middleware;
+namespace AlazziAz\LaravelDaprListener\Middleware;
 
-use AlazziAz\DaprEventsListener\Consuming\ListenerContext;
+use AlazziAz\LaravelDaprListener\Consuming\ListenerContext;
 use Closure;
 use Illuminate\Support\Facades\Log;
 

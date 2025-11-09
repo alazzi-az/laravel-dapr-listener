@@ -1,6 +1,6 @@
 <?php
 
-namespace AlazziAz\DaprEventsListener\Consuming;
+namespace AlazziAz\LaravelDaprListener\Consuming;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,7 +19,7 @@ class IngressController
             'topic' => $topic,
             'body' => $request->all(),
         ]);
-        $prefix = trim(config('dapr-events.http.prefix', 'dapr'), '/');
+        $prefix = trim(config('dapr.http.prefix', 'dapr'), '/');
         $topic = $topic ? trim($topic, '/') : '';
         $route = $prefix.'/ingress'.($topic ? '/'.$topic : '');
 

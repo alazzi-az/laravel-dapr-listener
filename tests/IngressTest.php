@@ -1,6 +1,6 @@
 <?php
 
-use AlazziAz\DaprEvents\Support\SubscriptionRegistry;
+use AlazziAz\LaravelDapr\Support\SubscriptionRegistry;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 
@@ -13,7 +13,7 @@ beforeEach(function () {
 
     namespace App\Events;
 
-    use AlazziAz\DaprEvents\Attributes\Topic;
+    use AlazziAz\LaravelDapr\Attributes\Topic;
 
     #[Topic('orders.placed')]
     class OrderPlaced

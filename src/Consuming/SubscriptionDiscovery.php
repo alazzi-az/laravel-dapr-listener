@@ -1,11 +1,11 @@
 <?php
 
-namespace AlazziAz\DaprEventsListener\Consuming;
+namespace AlazziAz\LaravelDaprListener\Consuming;
 
-use AlazziAz\DaprEvents\Attributes\Topic;
-use AlazziAz\DaprEvents\Support\SubscriptionRegistry;
-use AlazziAz\DaprEvents\Support\TopicResolver;
-use AlazziAz\DaprEventsListener\Support\ClassFinder;
+use AlazziAz\LaravelDapr\Attributes\Topic;
+use AlazziAz\LaravelDapr\Support\SubscriptionRegistry;
+use AlazziAz\LaravelDapr\Support\TopicResolver;
+use AlazziAz\LaravelDaprListener\Support\ClassFinder;
 use Illuminate\Support\Collection;
 use ReflectionAttribute;
 use ReflectionClass;
