@@ -39,7 +39,7 @@ class MessageProcessor
         }
 
         $raw = $this->decodeRequest($request);
-        $payload = $raw['data'] ?? $raw;
+        $payload = $raw['body']['data']  ?? $raw;
 
         $metadata = $this->extractMetadata($request, $raw);
 
