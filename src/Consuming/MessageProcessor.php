@@ -4,7 +4,6 @@ namespace AlazziAz\LaravelDaprListener\Consuming;
 
 use AlazziAz\LaravelDapr\Support\IngressContext;
 use AlazziAz\LaravelDapr\Support\IngressSignatureVerifier;
-use AlazziAz\LaravelDapr\Support\Subscription;
 use AlazziAz\LaravelDapr\Support\SubscriptionRegistry;
 use AlazziAz\LaravelDaprListener\Support\EventHydrator;
 use Illuminate\Contracts\Config\Repository;
@@ -12,35 +11,43 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class MessageProcessor
 {
     public function __construct(
-        protected SubscriptionRegistry $subscriptions,
+        protected SubscriptionRegistry     $subscriptions,
         protected IngressSignatureVerifier $signature,
-        protected EventHydrator $hydrator,
-        protected Dispatcher $events,
-        protected IngressContext $ingressContext,
-        protected Pipeline $pipeline,
-        protected Repository $config
-    ) {
+        protected EventHydrator            $hydrator,
+        protected Dispatcher               $events,
+        protected IngressContext           $ingressContext,
+        protected Pipeline                 $pipeline,
+        protected Repository               $config
+    )
+    {
     }
 
     public function handle(Request $request, string $routeKey): array
     {
-        if (! $this->signature->verify($request)) {
+        if (!$this->signature->verify($request)) {
             abort(403, 'Invalid Dapr ingress signature.');
         }
 
         $subscription = $this->subscriptions->findByRoute($routeKey);
 
-        if (! $subscription) {
+        if (!$subscription) {
             abort(404, "Unknown Dapr topic for route [$routeKey]");
         }
 
         $raw = $this->decodeRequest($request);
-        $payload =  $raw['data'] ?? ($raw['body']['data'] ?? $raw);
+        logger()->debug('Dapr message received', [
+            'raw' => $raw,
+            'request' => [
+                'query' => $request->query->all(),
+                'headers' => $request->headers->all(),
+                'body' => $request->all()
+            ]
+        ]);
+        $payload = $raw['data'] ?? ($raw['body']['data'] ?? $raw);
 
         $metadata = $this->extractMetadata($request, $raw);
 
@@ -98,6 +105,9 @@ class MessageProcessor
         if (isset($raw['metadata']) && is_array($raw['metadata'])) {
             $metadata = $raw['metadata'];
         }
+        if ($request->query->has('metadata')) {
+            $metadata = array_merge($metadata, (array)$request->query->get('metadata', []));
+        }
 
         // 2) CloudEvent extensions (only if your emitter used CloudEvents extensions explicitly)
         if (isset($raw['extensions']) && is_array($raw['extensions'])) {
@@ -111,10 +121,6 @@ class MessageProcessor
             }
         }
 
-        // 4) Optional: include request headers (often noisy; consider filtering)
-        foreach ($request->headers->all() as $key => $values) {
-            $metadata['header_' . Str::snake($key)] = implode(',', $values);
-        }
 
         return $metadata;
     }
