@@ -12,6 +12,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class MessageProcessor
 {
@@ -39,7 +40,7 @@ class MessageProcessor
         }
 
         $raw = $this->decodeRequest($request);
-        $payload = $raw['body']['data']  ?? $raw;
+        $payload =  $raw['data'] ?? ($raw['body']['data'] ?? $raw);
 
         $metadata = $this->extractMetadata($request, $raw);
 
@@ -93,16 +94,26 @@ class MessageProcessor
     {
         $metadata = [];
 
+        // 1) Dapr publish metadata (from query metadata.*)
+        if (isset($raw['metadata']) && is_array($raw['metadata'])) {
+            $metadata = $raw['metadata'];
+        }
+
+        // 2) CloudEvent extensions (only if your emitter used CloudEvents extensions explicitly)
         if (isset($raw['extensions']) && is_array($raw['extensions'])) {
-            $metadata = $raw['extensions'];
+            $metadata = array_merge($metadata, $raw['extensions']);
         }
 
-        if (isset($raw['traceid'])) {
-            $metadata['traceid'] = $raw['traceid'];
+        // 3) Trace context commonly forwarded by Dapr
+        foreach (['traceid', 'traceparent', 'tracestate'] as $key) {
+            if (!empty($raw[$key])) {
+                $metadata[$key] = $raw[$key];
+            }
         }
 
+        // 4) Optional: include request headers (often noisy; consider filtering)
         foreach ($request->headers->all() as $key => $values) {
-            $metadata['header_'.$key] = implode(',', $values);
+            $metadata['header_' . Str::snake($key)] = implode(',', $values);
         }
 
         return $metadata;
