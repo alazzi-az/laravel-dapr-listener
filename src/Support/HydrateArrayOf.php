@@ -3,7 +3,7 @@
 namespace AlazziAz\LaravelDaprListener\Support;
 use Attribute;
 
-#[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 class HydrateArrayOf
 {
     /**
