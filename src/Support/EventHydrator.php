@@ -26,7 +26,7 @@ class EventHydrator
             payload: $payload,
             unwrapCloudEvent: true,
             allowFromPayload: true,
-            allowFrom: false,
+            allowFrom: true,
         );
     }
 
