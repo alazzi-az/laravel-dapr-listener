@@ -11,27 +11,41 @@ use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionParameter;
-
+use Illuminate\Contracts\Config\Repository as Config;
 class SubscriptionDiscovery
 {
     public function __construct(
         protected SubscriptionRegistry $subscriptions,
         protected TopicResolver $topics,
-        protected ClassFinder $classes
+        protected ClassFinder $classes,
+        protected Config $config,
     ) {
     }
 
     public function discover(): void
     {
-        $this->registerAttributedEvents();
-        $this->registerAttributedListeners();
+        $discovery = (array) $this->config->get('dapr.listener.discovery', []);
+
+        if (!($discovery['enabled'] ?? true)) {
+            return;
+        }
+
+   
+
+
+        if (($discovery['events']['enabled'] ?? false)) {
+            $this->registerAttributedEvents();
+        }
+
+        if (($discovery['listeners']['enabled'] ?? true)) {
+            $this->registerAttributedListeners();
+        }
     }
 
     protected function registerAttributedEvents(): void
     {
-        $directories = [
-            app_path('Events'),
-        ];
+
+        $directories = (array) $this->config->get('dapr.listener.discovery.events.directories', [app_path('Events')]);
 
         foreach ($directories as $directory) {
             foreach ($this->classes->within($directory) as $class) {
@@ -51,9 +65,8 @@ class SubscriptionDiscovery
 
     protected function registerAttributedListeners(): void
     {
-        $directories = [
-            app_path('Listeners'),
-        ];
+
+        $directories = (array) $this->config->get('dapr.listener.discovery.listeners.directories', [app_path('Listeners')]);
 
         foreach ($directories as $directory) {
             foreach ($this->classes->within($directory) as $class) {

@@ -2,6 +2,7 @@
 
 namespace AlazziAz\LaravelDaprListener\Support;
 
+use AlazziAz\LaravelDapr\Dtos\CloudEventData;
 use BackedEnum;
 use Carbon\Carbon;
 use DateTimeImmutable;
@@ -76,10 +77,37 @@ class EventHydrator
         }
 
         // Unwrap CloudEvent-ish wrappers.
-        if ($unwrapCloudEvent) {
-            $payload = $this->unwrapCloudEvent($payload);
-            $payload = $payload['data'] ?? $payload;
+
+        // ✅ NEW: keep CloudEvent envelope if present
+        $cloudEventContext = null;
+
+
+        $envelope = $payload;
+
+        // if it looks like a CloudEvent, build context (but still hydrate from data)
+        if (isset($envelope['specversion']) || isset($envelope['type'], $envelope['source'])) {
+            $knownKeys = [
+                'specversion', 'id', 'source', 'type', 'subject', 'time', 'datacontenttype', 'data'
+            ];
+
+            $extensions = array_diff_key($envelope, array_flip($knownKeys));
+
+            $cloudEventContext = new CloudEventData(
+                specversion: $envelope['specversion'] ?? null,
+                id: $envelope['id'] ?? null,
+                source: $envelope['source'] ?? null,
+                type: $envelope['type'] ?? null,
+                subject: $envelope['subject'] ?? null,
+                time: $envelope['time'] ?? null,
+                datacontenttype: $envelope['datacontenttype'] ?? null,
+                data: $envelope['data'] ?? null,
+                extensions: $extensions,
+                raw: $envelope,
+            );
         }
+
+        // ✅ keep existing behavior: hydrate from "data" if present
+        $payload = $envelope['data'] ?? $envelope;
 
         $reflection = new ReflectionClass($class);
 
@@ -90,9 +118,15 @@ class EventHydrator
         $constructor = $reflection->getConstructor();
 
         if (!$constructor) {
-            return new $class();
-        }
+            $obj = new $class();
 
+            // ✅ NEW: inject cloud context if supported
+            if ($cloudEventContext && method_exists($obj, 'setCloudData')) {
+                $obj->setCloudData($cloudEventContext);
+            }
+
+            return $obj;
+        }
         $flattened = Arr::dot($payload);
 
         $arguments = [];
@@ -122,28 +156,15 @@ class EventHydrator
                 "Missing value for parameter [{$paramName}] of event [$class]."
             );
         }
+        $obj = $reflection->newInstanceArgs($arguments);
 
-        return $reflection->newInstanceArgs($arguments);
-    }
-
-    /**
-     * Unwrap common CloudEvent envelope formats.
-     * We keep this permissive because different emitters vary.
-     */
-    protected function unwrapCloudEvent(array $payload): array
-    {
-        // Typical CloudEvent (v1) shape: { specversion, type, source, id, time?, datacontenttype?, data: {...} }
-        if (isset($payload['specversion'], $payload['data'])) {
-            return $payload;
+        if ($cloudEventContext && method_exists($obj, 'setCloudData')) {
+            $obj->setCloudData($cloudEventContext);
         }
 
-        // Some emitters nest event under "data" only.
-        if (array_key_exists('data', $payload) && is_array($payload['data'])) {
-            return $payload;
-        }
-
-        return $payload;
+        return $obj;
     }
+
 
     /**
      * Resolve value for a given constructor parameter name.

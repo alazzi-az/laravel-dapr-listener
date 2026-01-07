@@ -18,6 +18,10 @@ class IngressController
             'path' => $request->path(),
             'topic' => $topic,
             'body' => $request->all(),
+            'headers' => $request->headers->all(),
+            'query' => $request->query->all(),
+            'method' => $request->method(),
+            'ip' => $request->ip(),
         ]);
         $prefix = trim(config('dapr.http.prefix', 'dapr'), '/');
         $topic = $topic ? trim($topic, '/') : '';

@@ -47,11 +47,11 @@ class MessageProcessor
                 'body' => $request->all()
             ]
         ]);
-        $payload = $raw['data'] ?? ($raw['body']['data'] ?? $raw);
+        $payload = $raw;
 
         $metadata = $this->extractMetadata($request, $raw);
 
-        $event = $this->hydrator->make($subscription->event, $payload);
+        $event = $this->hydrator->make($subscription->event, $raw);
         $this->ingressContext->markInbound($event);
 
         $context = new ListenerContext(
@@ -119,6 +119,11 @@ class MessageProcessor
             if (!empty($raw[$key])) {
                 $metadata[$key] = $raw[$key];
             }
+        }
+
+        // headers
+        foreach ($request->headers->all() as $key => $value) {
+            $metadata[$key] = $value[0];
         }
 
 
